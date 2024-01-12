@@ -100,7 +100,7 @@ int create_tables(sqlite3 *db) {
 
 const char ****atayici(sqlite3 *db) {
 	int rc,tableCount = 0;
-    char *sorgu = "SELECT COUNT(name) FROM sqlite_master WHERE type='table'",err_msg = 0;
+    const char *sorgu = "SELECT COUNT(name) FROM sqlite_master WHERE type='table'",err_msg = 0;
     rc = sqlite3_exec(db, sorgu, callback, &tableCount, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
@@ -109,7 +109,7 @@ const char ****atayici(sqlite3 *db) {
         return 1;
     }
 	    char **tableNames = malloc(tableCount * sizeof(char*));
-	    rc = sqlite3_exec(db, sorgu, callback, &tableNames, &ErrMsg);
+	    rc = sqlite3_exec(db, sorgu, callback, &tableNames, &err_msg);
     if(rc != SQLITE_OK) {
         fprintf(stderr, "SQL hatası: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
@@ -126,6 +126,59 @@ const char ****atayici(sqlite3 *db) {
     }
     strcpy(query, ssrg);
     strcat(query, tableNames[i]);
+    sqlite3_stmt *stmt;
+	rc = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL hatası: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return 1;
+    }
+	    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+			//counter sutun sorgu
+			const char* cssrg = "PRAGMA table_info(";
+			int totalLength2 = strlen(cssrg) + strlen(tableNames[i]) + 3;
+			char *query2 = (char *)malloc(totalLength2 * sizeof(char));
+			if (query2 == NULL) {
+				fprintf(stderr, "Bellek tahsis edilemedi.\n");
+				exit(1);
+			}
+		    strcpy(query2, cssrg);
+		    strcat(query2, tableNames[i]);
+		    strcat(query2, ");");
+		    sqlite3_stmt *stmt2;
+		    rc = sqlite3_prepare_v2(db, query2, -1, &stmt2, 0);
+			if (rc != SQLITE_OK) {
+				fprintf(stderr, "SQL hatası: %s\n", sqlite3_errmsg(db));
+				return 1;
+			}
+			int column_counter = 0;
+		    size_t boyut = 0;
+		    char *kaydedilenSutunIsmi = NULL;
+			while (sqlite3_step(stmt2) == SQLITE_ROW) {
+		        const char *sutunIsmi = (const char *)sqlite3_column_text(stmt2, column_count);
+		        size_t uzunluk = strlen(sutunIsmi) + 1; // +1 for null terminator
+				if (boyut < uzunluk) {
+					char *yeniAlan = realloc(kaydedilenSutunIsmi, uzunluk);
+					if (!yeniAlan) {
+						fprintf(stderr, "Bellek tahsisi başarısız oldu.\n");
+						free(kaydedilenSutunIsmi);
+						free(yeniAlan);
+						free(query);
+						free(query2);
+						free(*tableNames);
+						sqlite3_finalize(stmt1);
+						sqlite3_finalize(stmt2);
+						sqlite3_close(db);
+						return 1;
+					}
+					kaydedilenSutunIsmi = yeniAlan;
+					boyut = uzunluk;
+				}
+				strcpy(kaydedilenSutunIsmi, sutunIsmi);
+				column_counter++;
+			}
+			sqlite3_finalize(stmt2);
+    }
 	}
 
     return data;
