@@ -51,38 +51,6 @@ int initialize_db(sqlite3 **db) {
 
 int create_tables(sqlite3 *db) {
     char *errMsg = 0;
-// 'create_tables' fonksiyonuna eklenecek
-const char *additional_sql = 
-    "CREATE TABLE IF NOT EXISTS MATCH(" \
-    "ID INT PRIMARY KEY NOT NULL," \
-    "TEAM1_ID INT NOT NULL," \
-    "TEAM2_ID INT NOT NULL," \
-    "SCORE1 INT," \
-    "SCORE2 INT," \
-    "MATCH_DATE DATE NOT NULL);" \
-    "CREATE TABLE IF NOT EXISTS STATISTICS(" \
-    "PLAYER_ID INT PRIMARY KEY NOT NULL," \
-    "GOALS INT NOT NULL," \
-    "ASSISTS INT NOT NULL," \
-    "MATCHES_PLAYED INT NOT NULL);";
-
-sqlite3_exec(db, additional_sql, callback, 0, &errMsg);
-// 'create_tables' fonksiyonuna eklenecek
-const char *additional_tables_sql = 
-    "CREATE TABLE IF NOT EXISTS TRANSFER(" \
-    "ID INT PRIMARY KEY NOT NULL," \
-    "PLAYER_ID INT NOT NULL," \
-    "FROM_TEAM INT," \
-    "TO_TEAM INT," \
-    "TRANSFER_FEE INT NOT NULL," \
-    "TRANSFER_DATE DATE NOT NULL);" \
-    "CREATE TABLE IF NOT EXISTS TACTICS(" \
-    "ID INT PRIMARY KEY NOT NULL," \
-    "TEAM_ID INT NOT NULL," \
-    "FORMATION TEXT NOT NULL," \
-    "STYLE TEXT NOT NULL);";
-
-sqlite3_exec(db, additional_tables_sql, callback, 0, &errMsg);
     const char *sql = 
         "CREATE TABLE IF NOT EXISTS PLAYER(" \
         "ID INT PRIMARY KEY NOT NULL," \
@@ -94,8 +62,31 @@ sqlite3_exec(db, additional_tables_sql, callback, 0, &errMsg);
         "ID INT PRIMARY KEY NOT NULL," \
         "NAME TEXT NOT NULL," \
         "FOUNDED YEAR INT NOT NULL," \
-        "STADIUM TEXT NOT NULL);";
-
+        "STADIUM TEXT NOT NULL);" \
+		"CREATE TABLE IF NOT EXISTS MATCH(" \
+		"ID INT PRIMARY KEY NOT NULL," \
+		"TEAM1_ID INT NOT NULL," \
+		"TEAM2_ID INT NOT NULL," \
+		"SCORE1 INT," \
+		"SCORE2 INT," \
+		"MATCH_DATE DATE NOT NULL);" \
+		"CREATE TABLE IF NOT EXISTS STATISTICS(" \
+		"PLAYER_ID INT PRIMARY KEY NOT NULL," \
+		"GOALS INT NOT NULL," \
+		"ASSISTS INT NOT NULL," \
+		"MATCHES_PLAYED INT NOT NULL);"
+	    "CREATE TABLE IF NOT EXISTS TRANSFER(" \
+		"ID INT PRIMARY KEY NOT NULL," \
+		"PLAYER_ID INT NOT NULL," \
+		"FROM_TEAM INT," \
+		"TO_TEAM INT," \
+		"TRANSFER_FEE INT NOT NULL," \
+		"TRANSFER_DATE DATE NOT NULL);" \
+		"CREATE TABLE IF NOT EXISTS TACTICS(" \
+		"ID INT PRIMARY KEY NOT NULL," \
+		"TEAM_ID INT NOT NULL," \
+		"FORMATION TEXT NOT NULL," \
+		"STYLE TEXT NOT NULL);";
     int rc = sqlite3_exec(db, sql, callback, 0, &errMsg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", errMsg);
