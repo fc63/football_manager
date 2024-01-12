@@ -7,7 +7,7 @@
 #include "database.h"
 #include "sqlite3.h"
 
-#define PORT 8018
+#define PORT 8017
 
 int main() {
     int server_fd, new_socket;
@@ -18,6 +18,9 @@ int main() {
     create_tables(db);
     char command[50];
     char buffer[1024] = {0};
+int a,rc,rc2,rc3,rc4;
+char* errMessage = 0;
+
 
     // Soket oluşturma
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -40,15 +43,27 @@ int main() {
         perror("listen");
         exit(EXIT_FAILURE);
     }
+	//sql içindekileri gösterme
+	 const char *sql = "SELECT * FROM MATCH;";
+	  const char *sql2 = "SELECT * FROM TRANSFER;";
+	  const char *sql3 = "SELECT * FROM STATISTICS;";
+	  	  const char *sql4 = "SELECT * FROM TACTICS;";
+    // SQL sorgusunu çalıştır
+	printf("SQL Tabloları: \n");
+    query_and_print(db, sql);
+	query_and_print(db, sql2);
+	query_and_print(db, sql3);
+	query_and_print(db, sql4);
 
     // İstemci bağlantısını kabul etme
-    while (1) {
+    do{
         // Yeni istemci bağlantısını kabul etme
-        int new_socket;
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
             perror("accept");
             continue;
         }
+		scanf("%d",&a);
+			    query_all_players(db);
     char *message = "Merhaba Futbol Menajeri!\n";
     send(new_socket, message, strlen(message), 0);
     printf("Hoş geldin mesajı gönderildi\n");
@@ -57,7 +72,6 @@ int main() {
 
         // Komutları işleme (örnek: "add_match 1 2 3 2 1 2024-01-12")
         sscanf(buffer, "%s", command);
-
         if (strcmp(command, "add_match") == 0) {
             int match_id, team1_id, team2_id, score1, score2;
             char match_date[50];
@@ -79,7 +93,7 @@ int main() {
         // Diğer komutlar ve işlevler...
 
         close(new_socket); // İstemci bağlantısını kapat
-    }
+    }while(a!=33);
 
 
 

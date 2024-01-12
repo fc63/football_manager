@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 
-static int callback(void *data, int argc, char **argv, char **azColName){
+int callback(void *data, int argc, char **argv, char **azColName){
     int i;
     fprintf(stderr, "%s: ", (const char*)data);
 
@@ -12,6 +12,31 @@ static int callback(void *data, int argc, char **argv, char **azColName){
     printf("\n");
     return 0;
 }
+int print_query_results(void *NotUsed, int argc, char **argv, char **azColName){
+    NotUsed = 0;
+    
+    // Sütun başlıklarını yazdır
+    for (int i = 0; i < argc; i++) {
+        printf("%-20s", azColName[i]);
+    }
+    printf("\n");
+
+    // Satır verilerini yazdır
+    for (int i = 0; i < argc; i++) {
+        printf("%-20s", argv[i] ? argv[i] : "NULL");
+    }
+    printf("\n");
+    
+    return 0;
+}
+void query_and_print(sqlite3 *db, const char *sql_query) {
+    char *errMsg = 0;
+    if (sqlite3_exec(db, sql_query, print_query_results, 0, &errMsg) != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", errMsg);
+        sqlite3_free(errMsg);
+    }
+}
+
 
 int initialize_db(sqlite3 **db) {
     int rc = sqlite3_open("football_manager.db", db);
@@ -132,6 +157,25 @@ int query_player(sqlite3 *db, int id) {
     }
     return 0;
 }
+
+void query_all_players(sqlite3 *db) {
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db, "SELECT * FROM PLAYER;", -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            int id = sqlite3_column_int(stmt, 0);
+            const unsigned char *name = sqlite3_column_text(stmt, 1);
+            int age = sqlite3_column_int(stmt, 2);
+            const unsigned char *position = sqlite3_column_text(stmt, 3);
+            int rating = sqlite3_column_int(stmt, 4);
+
+            printf("ID: %d, Name: %s, Age: %d, Position: %s, Rating: %d\n", id, name, age, position, rating);
+        }
+    } else {
+        fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+}
+
 
 // Oyuncu silme fonksiyonu
 int delete_player(sqlite3 *db, int id) {

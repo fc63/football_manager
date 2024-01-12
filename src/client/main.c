@@ -44,7 +44,6 @@ int main() {
         send(sock, command, strlen(command), 0); // Komutu sunucuya gönder
 
         // Sunucudan yanıtı al ve yazdır
-        char buffer[1024] = {0};
         read(sock, buffer, 1024);
         printf("Sunucudan gelen yanıt: %s\n", buffer);
 
@@ -71,9 +70,22 @@ send(sock, command, strlen(command), 0);
     return 0;
 }
 
+int giris() {
+    int choice;
+    printf("\n--- Giris Ekrani ---\n");
+    printf("1. Transferler\n");
+    printf("2. Taktikler\n");
+    printf("3. Maçlar\n");
+    printf("4. İstatistikler\n");
+    printf("5. Çıkış\n");
+    printf("Seçiminizi yapın: ");
+    scanf("%d", &choice);
+    return choice;
+}
+
 int show_menu() {
     int choice;
-    printf("\n--- Futbol Menajerlik Oyunu Menüsü ---\n");
+    printf("\n--- Futbol Menajerlik Oyun Menüsü ---\n");
     printf("1. Transferler\n");
     printf("2. Taktikler\n");
     printf("3. Maçlar\n");
