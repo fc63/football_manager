@@ -6,11 +6,12 @@
 //#include <winsock2.h>
 #include "database.h"
 #include "sqlite3.h"
+#include <openssl/sha.h> 
 
 #define PORT 8017
 
 int main() {
-    int server_fd, new_socket;
+    int server_fd, new_socket,a;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     sqlite3 *db;
@@ -18,8 +19,6 @@ int main() {
     create_tables(db);
     char command[50];
     char buffer[1024] = {0};
-int a,rc,rc2,rc3,rc4;
-char* errMessage = 0;
 
 
     // Soket oluşturma
