@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sqlite3.h>
+#include <string.h>
 
 int callback(void *data, int argc, char **argv, char **azColName){
     int i;
@@ -95,6 +96,39 @@ int create_tables(sqlite3 *db) {
         fprintf(stdout, "Tables created successfully\n");
     }
     return rc;
+}
+
+const char ****atayici(sqlite3 *db) {
+	int rc,tableCount = 0;
+    char *sorgu = "SELECT COUNT(name) FROM sqlite_master WHERE type='table'",err_msg = 0;
+    rc = sqlite3_exec(db, sorgu, callback, &tableCount, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return 1;
+    }
+	    char **tableNames = malloc(tableCount * sizeof(char*));
+	    rc = sqlite3_exec(db, sorgu, callback, &tableNames, &ErrMsg);
+    if(rc != SQLITE_OK) {
+        fprintf(stderr, "SQL hatası: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    } else {
+        fprintf(stdout, "Tablo isimleri başarıyla alındı\n");
+    }
+    const char *ssrg = "SELECT * FROM ";
+	for(int i=0; i<tableCount;i++){
+	int totalLength = strlen(ssrg) + strlen(tableNames[i]) + 1;
+    char *query = (char *)malloc(totalLength * sizeof(char));
+	if (query == NULL) {
+        fprintf(stderr, "Bellek tahsis edilemedi.\n");
+        exit(1);
+    }
+    strcpy(query, ssrg);
+    strcat(query, tableNames[i]);
+	}
+
+    return data;
 }
 
 // Oyuncu ekleme fonksiyonu

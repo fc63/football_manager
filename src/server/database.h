@@ -17,6 +17,9 @@ void query_all_players(sqlite3 *db);
 int callback(void *data, int argc, char **argv, char **azColName);
 int print_query_results(void *NotUsed, int argc, char **argv, char **azColName);
 void query_and_print(sqlite3 *db, const char *sql_query);
+int getRowCount(sqlite3 *db, const char *tableName);
+void printsqltable(sqlite3 *db);
+
 
 
 // Diğer veritabanı işlevlerinin prototipleri burada olacak...

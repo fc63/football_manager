@@ -42,17 +42,6 @@ int main() {
         perror("listen");
         exit(EXIT_FAILURE);
     }
-	//sql içindekileri gösterme
-	 const char *sql = "SELECT * FROM MATCH;";
-	  const char *sql2 = "SELECT * FROM TRANSFER;";
-	  const char *sql3 = "SELECT * FROM STATISTICS;";
-	  	  const char *sql4 = "SELECT * FROM TACTICS;";
-    // SQL sorgusunu çalıştır
-	printf("SQL Tabloları: \n");
-    query_and_print(db, sql);
-	query_and_print(db, sql2);
-	query_and_print(db, sql3);
-	query_and_print(db, sql4);
 
     // İstemci bağlantısını kabul etme
     do{
@@ -61,33 +50,43 @@ int main() {
             perror("accept");
             continue;
         }
-		scanf("%d",&a);
-			    query_all_players(db);
+//sql içindekileri gösterme
+	 const char *sqltables = "SELECT name FROM sqlite_master WHERE type='table'";
+	 const char *sql2 = "SELECT * FROM TRANSFER;";
+	 const char *sql3 = "SELECT * FROM STATISTICS;";
+	 const char *sql4 = "SELECT * FROM TACTICS;";
+    // SQL sorgusunu çalıştır
+	printf("SQL Tabloları: \n");
+	for(int i=0;i<)
+    query_and_print(db, sqltables);
+	query_and_print(db, sql2);
+	query_and_print(db, sql3);
+	query_and_print(db, sql4);
     char *message = "Merhaba Futbol Menajeri!\n";
     send(new_socket, message, strlen(message), 0);
     printf("Hoş geldin mesajı gönderildi\n");
 
         read(new_socket, buffer, 1024); // İstemciden komut okuma
 
-        // Komutları işleme (örnek: "add_match 1 2 3 2 1 2024-01-12")
-        sscanf(buffer, "%s", command);
-        if (strcmp(command, "add_match") == 0) {
-            int match_id, team1_id, team2_id, score1, score2;
-            char match_date[50];
-            sscanf(buffer, "%*s %d %d %d %d %d %s", &match_id, &team1_id, &team2_id, &score1, &score2, match_date);
-            add_match(db, match_id, team1_id, team2_id, score1, score2, match_date);
-        }
+    // Komutları işleme (örnek: "add_match 1 2 3 2 1 2024-01-12")
+    sscanf(buffer, "%s", command);
+    if (strcmp(command, "add_match") == 0) {
+        int match_id, team1_id, team2_id, score1, score2;
+        char match_date[50];
+        sscanf(buffer, "%*s %d %d %d %d %d %s", &match_id, &team1_id, &team2_id, &score1, &score2, match_date);
+        add_match(db, match_id, team1_id, team2_id, score1, score2, match_date);
+    }
 	if (strcmp(command, "add_transfer") == 0) {
-    int id, player_id, from_team, to_team, transfer_fee;
-    char transfer_date[50];
-    sscanf(buffer, "%*s %d %d %d %d %d %s", &id, &player_id, &from_team, &to_team, &transfer_fee, transfer_date);
-    add_transfer(db, id, player_id, from_team, to_team, transfer_fee, transfer_date);
+		int id, player_id, from_team, to_team, transfer_fee;
+		char transfer_date[50];
+		sscanf(buffer, "%*s %d %d %d %d %d %s", &id, &player_id, &from_team, &to_team, &transfer_fee, transfer_date);
+		add_transfer(db, id, player_id, from_team, to_team, transfer_fee, transfer_date);
 	}
 	if (strcmp(command, "set_tactics") == 0) {
-    int id, team_id;
-    char formation[50], style[50];
-    sscanf(buffer, "%*s %d %d %s %s", &id, &team_id, formation, style);
-    set_tactics(db, id, team_id, formation, style);
+		int id, team_id;
+		char formation[50], style[50];
+		sscanf(buffer, "%*s %d %d %s %s", &id, &team_id, formation, style);
+		set_tactics(db, id, team_id, formation, style);
 	}
         // Diğer komutlar ve işlevler...
 
